@@ -1,0 +1,24 @@
+{
+  "params":
+  {
+    "local_host": "localhost",
+    "local_server":"True",
+    "local_database":"tradeport",
+    "local_user": "root",
+    "local_password": "",
+    "prod_host": "localhost",
+    "prod_database": "tradeport",
+    "prod_user": "root",
+    "prod_password": "",
+    "fb_url": "https://facebook.com/",
+    "insta_url": "https://instagram.com/",
+    "git_url": "https://github.com/",
+    "site_name": "TradePort",
+    "site_title": "Tradeport",
+    "site_tagline": "Technical analysis makes the Magic",
+    "mail_username": "meetdashhere2304@gmail.com",
+    "mail_password": "Ilove23081996",
+    "about": "This website is dedicated for those who want to learn trading\nYou would get lot to learn in this website",
+    "no_of_posts_on_homepage": 5
+  }
+}

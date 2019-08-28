@@ -1,0 +1,88 @@
+www.wesitename.com/static - shows the all the folder things
+/templates is kept as private normally
+
+Make two folders - Static and templates in the project folder
+
+Server side scripting languauges are - PHP, ASP.net ,Java ,Python(Django ,flask)
+Client side scripting languages - Java
+
+Use the text editor - sublimetext-3 -It autocompletes the codes like HTML
+
+While running the other file stop the running of previous program
+
+Dynamic website: We can send the values from python to HTML
+refer _2_ 14-16
+
+Bootstrap - A fully cooked front end files
+Just get that from the website and add them here
+websites - https://getbootstrap.com/docs/4.3/getting-started/introduction/
+
+In the html file we can directly use
+<img scr='directory'>
+this is not a best practice
+<img src={{url_for('static',filename='name.png')}}>
+
+Jinja templating
+for loops and conditional statements like if else can't be executed in HTML it generates the HTML code for the purpose
+Jinja.pocoo.org - Documentation
+
+Template inheritance
+We can use another file with Jinja to inherit the other template
+{% extends "layout.html" %}
+{% block body %}
+  <ul>
+  {% for user in users %}
+    <li><a href="{{ user.url }}">{{ user.username }}</a></li>
+  {% endfor %}
+  </ul>
+{% endblock %}
+
+
+Xaamp is a software used to host the database locally on a computer
+other options are to do it on the cloud server like AWS,Digitalocean,Azure
+
+Download Xaamp
+Then install
+Open the Xampp control panel
+Run apache and mysql
+open localhost/myphpadmin/
+Then create database
+Then create table
+Then add rows and columns
+
+Then add database libraray
+Then create the database variables inside a class
+Then in the function add get and post
+
+
+Initially facebook icons were not visible the i added a link for that
+ <!-- Social media icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ for icons we can refer the footer of the layout file <i>
+
+in adding href to social media icons we have to use jinja
+we have to pass the parameters from the python program
+then we should access it there in the html file
+@app.route('/')
+def h():
+    return render_template('index.html', params=params)
+
+ <a href="{{params['fb_url']}}" target="_blank">
+
+
+To use mail
+import flask_mail - Mail,Message
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=465,
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME=params['mail_username'],
+    MAIL_PASSWORD=params['mail_password']
+)
+mail = Mail(app)
+ msg = Message("New Message from Tradeport by ",
+                      sender=params['mail_username'],
+                      recipients=[params['mail_username']],
+                      body=name+"\n"+message+'\n'+"Phone :"+phone+"\nEmail :"+email)
+        mail.send(msg)
+If authentication error then in gmail allow less secure apps
