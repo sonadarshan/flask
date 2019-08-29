@@ -86,3 +86,15 @@ mail = Mail(app)
                       body=name+"\n"+message+'\n'+"Phone :"+phone+"\nEmail :"+email)
         mail.send(msg)
 If authentication error then in gmail allow less secure apps
+
+
+<div class="edit-list">
+                  <ul class="alter-list">
+                     <li class="alter-item">
+                       <a class="alter-link float-right" href="/">EDIT</a>
+                     </li>
+                     <li class="alter-item">
+                       <a class="alter-link float-right" href="/about">DELETE</a>
+                     </li>
+                  </ul>
+              </div>

@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request,escape
+from flask import Flask, render_template, request, session
 from flask_mail import Mail
 from flask_mail import Message
 import pymysql
 import json
+from datetime import datetime
 
 
 class Post:
@@ -13,6 +14,7 @@ class Post:
         self.heading = result[3]
         self.sub_heading = result[4]
         self.content = result[5]
+        self.img_file = result[6]
 
 
 with open('templates/config.json', 'r')as c:
@@ -31,6 +33,7 @@ else:
 
 
 app = Flask(__name__)
+app.secret_key = 'super-secrete-key'
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=465,
@@ -60,7 +63,7 @@ def home():
     cursor.execute('SELECT * FROM blogs')
     results = cursor.fetchall()
     posts = []
-    for i in range(5):
+    for i in range(2):
         posts.append(Post(results[i]))
     return render_template('index.html', params=params, posts=posts)
 
@@ -73,7 +76,6 @@ def about():
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
-        '''Add entry to the database'''
         connection = pymysql.connect(host=host, user=user, passwd=passwd, database=database)
         cursor = connection.cursor()
         name = request.form.get('name')
@@ -98,16 +100,80 @@ def contact():
 def post_route(post_slug='gann-strategy'):
     connection = pymysql.connect(host=host, user=user, passwd=passwd, database=database)
     cursor = connection.cursor()
-    insert = f'Select * from blogs where slug="{post_slug}"'
+    insert = f'Select * from blogs where slug="{post_slug}";'
     cursor.execute(insert)
     result = cursor.fetchone()
     post = Post(result)
+    cursor.close()
+    connection.close()
     return render_template('post.html', params=params, post=post)
 
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=['GET', 'POST'])
 def dashboard():
-    return render_template('login.html')
+    connection = pymysql.connect(host=host, user=user, passwd=passwd, database=database)
+    cursor = connection.cursor()
+    cursor.execute('SELECT * FROM blogs;')
+    results = cursor.fetchall()
+    posts = []
+    for post in results:
+        posts.append(Post(post))
+    # Initially we should check whether someone is logged in or not
+    if user in session and session['user'] == params['admin_username']:
+        return render_template('dashboard.html', params=params, posts=posts)
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('pass')
+        if username == params['admin_username'] and password == params['admin_password']:
+            session['user'] = username
+            return render_template('dashboard.html', params=params, posts=posts)
+    cursor.close()
+    connection.close()
+    return render_template('login.html', params=params)
+
+
+@app.route("/edit/<int:id>", methods=['GET', 'POST'])
+def edit_post(id=0):
+    connection = pymysql.connect(host=host, user=user, passwd=passwd, database=database)
+    cursor = connection.cursor()
+    post = None
+    if id:
+        insert = f'Select * from blogs where id={id};'
+        cursor.execute(insert)
+        result = cursor.fetchone()
+        post = Post(result)
+    if request.method == 'POST':
+        heading = request.form.get('heading')
+        sub_heading = request.form.get('sub_heading')
+        content = request.form.get('content')
+        img_file = request.form.get('img_file')
+        slug = request.form.get('slug')
+        date = datetime.now()
+        if id == 0:
+            insert = f'insert into blogs (Heading,sub_heading,Content,img_file,slug,Date) values("{heading}","{sub_heading}","{content}","{img_file}","{slug}","{date}");'
+        else:
+            insert = f'update blogs set Heading="{heading}",sub_heading="{sub_heading}",Content="{content}",img_file="{img_file}",slug="{slug}",Date="{date}"  where id={id};'
+        cursor.execute(insert)
+        print("Executed: "+ insert)
+        connection.commit()
+        return render_template('edit_post.html', params=params, post=post, id=id)
+    cursor.close()
+    connection.close()
+    return render_template('edit_post.html', params=params, post=post, id=id)
+
+
+@app.route("/delete/<int:id>")
+def delete_post(id):
+    print("id : "+str(id))
+    connection = pymysql.connect(host=host, user=user, passwd=passwd, database=database)
+    cursor = connection.cursor()
+    insert = f'delete from blogs where id={id};'
+    cursor.execute(insert)
+    connection.commit()
+    cursor.close()
+    connection.close()
+    return render_template('dashboard.html', params=params)
 
 
 app.run(debug=True)
